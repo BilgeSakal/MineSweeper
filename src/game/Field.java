@@ -19,6 +19,12 @@ public class Field {
 		this.mine = mine;
 	}
 	
+	public boolean isMine() {
+		return mine;
+	}
+	
+	//getters and setters
+	
 	public void setXPos(int xPos) throws IndexOutOfBoundsException {
 		if(xPos >= 0)
 			this.xPos = xPos;
@@ -39,10 +45,6 @@ public class Field {
 	
 	public int getYPos() {
 		return yPos;
-	}
-	
-	public boolean isMine() {
-		return mine;
 	}
 
 }
