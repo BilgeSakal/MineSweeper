@@ -10,6 +10,11 @@ public class Point {
 		this.y = y;
 	}
 	
+	public Point() {
+		this.x = 0;
+		this.y = 0;
+	}
+	
 	//getters and setters
 	
 	public void setX(int x) {
