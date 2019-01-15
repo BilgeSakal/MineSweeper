@@ -7,20 +7,28 @@ public class Field {
 	
 	private boolean mine;
 	
+	private boolean stepped;
+	
 	public Field() {
 		this.xPos = 0;
 		this.yPos = 0;
 		this.mine = false;
+		this.stepped = false;
 	}
 	
 	public Field(int xPos, int yPos, boolean mine) {
 		this.xPos = xPos;
 		this.yPos = yPos;
 		this.mine = mine;
+		this.stepped = false;
 	}
 	
 	public boolean isMine() {
 		return mine;
+	}
+	
+	public boolean isStepped() {
+		return stepped;
 	}
 	
 	//getters and setters
@@ -37,6 +45,14 @@ public class Field {
 			this.yPos = yPos;
 		else
 			throw new IndexOutOfBoundsException();
+	}
+	
+	public void setMine(boolean mine) {
+		this.mine = mine;
+	}
+	
+	public void setStepped(boolean stepped) {
+		this.stepped = stepped;
 	}
 	
 	public int getXPos() {
