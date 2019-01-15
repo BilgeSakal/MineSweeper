@@ -9,9 +9,12 @@ public class Field {
 	
 	private boolean stepped;
 	
+	private int minesAround;
+	
 	public Field() {
 		this.xPos = 0;
 		this.yPos = 0;
+		this.minesAround = 0;
 		this.mine = false;
 		this.stepped = false;
 	}
@@ -20,6 +23,7 @@ public class Field {
 		this.xPos = xPos;
 		this.yPos = yPos;
 		this.mine = mine;
+		this.minesAround = 0;
 		this.stepped = false;
 	}
 	
@@ -53,6 +57,14 @@ public class Field {
 	
 	public void setStepped(boolean stepped) {
 		this.stepped = stepped;
+	}
+	
+	public void setMinesAround(int minesAround) {
+		this.minesAround = minesAround;
+	}
+	
+	public int getMinesAround() {
+		return minesAround;
 	}
 	
 	public int getXPos() {
