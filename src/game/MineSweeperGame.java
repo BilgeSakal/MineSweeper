@@ -1,5 +1,6 @@
 package game;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class MineSweeperGame {
@@ -9,14 +10,14 @@ public class MineSweeperGame {
 
 	private static final int MIN_ROW = 5;
 	private static final int MIN_COL = 5;
-	
+
 	private static final int MIN_MINES = 5;
 
 	private int row;
 	private int col;
 
-	private Field[][] area;
-	
+	public Field[][] area;
+
 	private int numOfMines;
 
 	public MineSweeperGame(int row, int col, int numOfMines) throws Exception {
@@ -26,40 +27,117 @@ public class MineSweeperGame {
 		setArea();
 		placeMines();
 	}
-	
+
 	public synchronized void step(int row, int col) {
 		Field steppedField = area[row][col];
-		if(!steppedField.isStepped()) {
-			
-			//find the number of mines around
+		if (!steppedField.isStepped()) {
+
+			// find the number of mines around
 			int minesAround = findMinesAround(steppedField);
-			
+
 			steppedField.setMinesAround(minesAround);
-			
-			//field is stepped
+
+			// field is stepped
 			steppedField.setStepped(true);
-			
-			//notify the button about changes
+
+			// notify the button about changes
 			notifyButton(steppedField);
-			
-			//if there is no mines around, then step the adjacent fields.
-			if(minesAround == 0) {
+
+			// if there is no mines around, then step the adjacent fields.
+			if (minesAround == 0) {
 				stepAround(steppedField);
 			}
 		}
 	}
-	
+
 	private void notifyButton(Field field) {
 		// TODO
 	}
-	
+
 	private void stepAround(Field field) {
-		// TODO
+		ArrayList<Point> adjacentLocations = getAdjacentFieldLocations(field);
+		for (Point p : adjacentLocations) {
+			step(p.getX(), p.getY());
+		}
 	}
-	
-	private int findMinesAround(Field field) {
-		// TODO
-		return 0;
+
+	public int findMinesAround(Field field) {
+		int xPos = field.getLocation().getX();
+		int yPos = field.getLocation().getY();
+
+		int mines = 0;
+
+		if (xPos < row - 1) {
+			if (yPos < col - 1) {
+				if(getField(xPos + 1, yPos + 1).isMine())
+					++mines;
+			}
+			if (yPos > 0) {
+				if(getField(xPos + 1, yPos - 1).isMine())
+					++mines;
+			}
+			if(getField(xPos + 1, yPos).isMine())
+				++mines;
+		}
+		if (xPos > 0) {
+			if (yPos < col - 1) {
+				if(getField(xPos - 1, yPos + 1).isMine())
+					++mines;
+			}
+			if (yPos > 0) {
+				if(getField(xPos - 1, yPos - 1).isMine())
+					++mines;
+			}
+			if(getField(xPos - 1, yPos).isMine())
+				++mines;
+		}
+		if (yPos > 0) {
+			if(getField(xPos, yPos - 1).isMine())
+				++mines;
+		}
+		if (yPos < col - 1) {
+			if(getField(xPos, yPos + 1).isMine())
+				++mines;
+		}
+		return mines;
+	}
+
+	private ArrayList<Point> getAdjacentFieldLocations(Field field) {
+		ArrayList<Point> adjacentLocations = new ArrayList<Point>();
+
+		int xPos = field.getLocation().getX();
+		int yPos = field.getLocation().getY();
+
+		if (xPos < row - 1) {
+			if (yPos < col - 1) {
+				adjacentLocations.add(new Point(xPos + 1, yPos + 1));
+			}
+			if (yPos > 0) {
+				adjacentLocations.add(new Point(xPos + 1, yPos - 1));
+			}
+			adjacentLocations.add(new Point(xPos + 1, yPos));
+		}
+		if (xPos > 0) {
+			if (yPos < col - 1) {
+				adjacentLocations.add(new Point(xPos - 1, yPos + 1));
+			}
+			if (yPos > 0) {
+				adjacentLocations.add(new Point(xPos - 1, yPos - 1));
+			}
+			adjacentLocations.add(new Point(xPos - 1, yPos));
+		}
+		if (yPos > 0) {
+			adjacentLocations.add(new Point(xPos, yPos - 1));
+		}
+		if (yPos < col - 1) {
+			adjacentLocations.add(new Point(xPos, yPos + 1));
+		}
+
+		return adjacentLocations;
+	}
+
+	private Field getField(int xPos, int yPos) {
+		return area[xPos][yPos];
 	}
 
 	/**
@@ -101,7 +179,7 @@ public class MineSweeperGame {
 	 *         otherwise.
 	 */
 	private boolean isValidRow(int row) {
-		if (row < MIN_ROW || row > MAX_ROW)
+		if (row >= MIN_ROW && row <= MAX_ROW)
 			return false;
 		return true;
 	}
@@ -114,13 +192,14 @@ public class MineSweeperGame {
 	 *         otherwise.
 	 */
 	private boolean isValidCol(int col) {
-		if (col < MIN_COL || col > MAX_COL)
+		if (col >= MIN_COL && col <= MAX_COL)
 			return false;
 		return true;
 	}
 
 	/**
 	 * Checks if {@code numOfMines} is in valid range.
+	 * 
 	 * @param numOfMines value that is going to be checked.
 	 * @return {@code true} if {@code numOfMines} is in valid range, {@code false}
 	 *         otherwise.
@@ -150,6 +229,14 @@ public class MineSweeperGame {
 			this.numOfMines = numOfMines;
 		else
 			throw new Exception();
+	}
+	
+	public int getRow() {
+		return row;
+	}
+	
+	public int getCol() {
+		return col;
 	}
 
 }
