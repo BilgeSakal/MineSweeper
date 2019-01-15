@@ -2,8 +2,7 @@ package game;
 
 public class Field {
 	
-	private int xPos;
-	private int yPos;
+	private Point location;
 	
 	private boolean mine;
 	
@@ -12,16 +11,14 @@ public class Field {
 	private int minesAround;
 	
 	public Field() {
-		this.xPos = 0;
-		this.yPos = 0;
+		location = new Point();
 		this.minesAround = 0;
 		this.mine = false;
 		this.stepped = false;
 	}
 	
 	public Field(int xPos, int yPos, boolean mine) {
-		this.xPos = xPos;
-		this.yPos = yPos;
+		location = new Point(xPos, yPos);
 		this.mine = mine;
 		this.minesAround = 0;
 		this.stepped = false;
@@ -37,20 +34,6 @@ public class Field {
 	
 	//getters and setters
 	
-	public void setXPos(int xPos) throws IndexOutOfBoundsException {
-		if(xPos >= 0)
-			this.xPos = xPos;
-		else
-			throw new IndexOutOfBoundsException();
-	}
-	
-	public void setYPos(int yPos) throws IndexOutOfBoundsException {
-		if(yPos >= 0)
-			this.yPos = yPos;
-		else
-			throw new IndexOutOfBoundsException();
-	}
-	
 	public void setMine(boolean mine) {
 		this.mine = mine;
 	}
@@ -63,16 +46,17 @@ public class Field {
 		this.minesAround = minesAround;
 	}
 	
+	public void setLocation(Point location) {
+		this.location = location;
+	}
+	
+	
+	public Point getLocation() {
+		return location;
+	}
+	
 	public int getMinesAround() {
 		return minesAround;
-	}
-	
-	public int getXPos() {
-		return xPos;
-	}
-	
-	public int getYPos() {
-		return yPos;
 	}
 
 }
