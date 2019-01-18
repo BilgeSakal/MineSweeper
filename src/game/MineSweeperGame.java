@@ -3,151 +3,214 @@ package game;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class MineSweeperGame {
+public class MineSweeperGame extends Game {
 
-	private static final int MAX_ROW = 50;
-	private static final int MAX_COL = 50;
-
-	private static final int MIN_ROW = 5;
-	private static final int MIN_COL = 5;
-
-	private static final int MIN_MINES = 5;
+	public static final int GAME_LOSE = -1;
+	public static final int GAME_WIN = 1;
 
 	private int row;
 	private int col;
 
-	public Field[][] area;
-
 	private int numOfMines;
 
-	public MineSweeperGame(int row, int col, int numOfMines) throws Exception {
+	private boolean steppedMine;
+
+	private int totalSteppedFields;
+	private int minesLeft;
+
+	private Field[][] mineField;
+
+	public MineSweeperGame(String name, int row, int col, int numOfMines) {
+		super(name);
+		steppedMine = false;
+		totalSteppedFields = 0;
+		minesLeft = numOfMines;
 		setRow(row);
 		setCol(col);
 		setNumOfMines(numOfMines);
-		setArea();
+	}
+
+	@Override
+	public void startGame() {
+		initMineField();
 		placeMines();
 	}
 
-	public synchronized void step(int row, int col) {
-		Field steppedField = area[row][col];
-		if (!steppedField.isStepped()) {
+	@Override
+	public int isFinished() {
+		if (steppedMine) {
+			return GAME_LOSE;
+		} else if (isWin()) {
+			return GAME_WIN;
+		} else {
+			return Game.NOT_FINISHED;
+		}
+	}
 
+	public boolean isWin() {
+		int totalFields = row * col;
+		return totalFields - numOfMines == totalSteppedFields;
+	}
+
+	/**
+	 * Steps the field in the position <b>{@code p}</b>. If there is no mine around
+	 * the stepped field, the fields around the stepped field will be stepped.
+	 * 
+	 * @param p indicates the location of the field.
+	 */
+	public void stepField(Point p) {
+		Field steppedField = mineField[p.getX()][p.getY()];
+		if (!steppedField.isStepped()) {
+			if (steppedField.isMine()) {
+				steppedMine = true;
+			}
 			// find the number of mines around
 			int minesAround = findMinesAround(steppedField);
 
-			steppedField.setMinesAround(minesAround);
-
-			// field is stepped
-			steppedField.setStepped(true);
-
-			// notify the button about changes
-			notifyButton(steppedField);
+			// step on field
+			steppedField.step(minesAround);
 
 			// if there is no mines around, then step the adjacent fields.
 			if (minesAround == 0) {
 				stepAround(steppedField);
 			}
+			++totalSteppedFields;
 		}
 	}
 
-	private void notifyButton(Field field) {
-		// TODO
-	}
-
+	/**
+	 * Steps the fields around the <b>{@code field}</b>.
+	 * 
+	 * @param field that adjacent fields to it will be stepped.
+	 */
 	private void stepAround(Field field) {
+		// get the position of the adjacent fields.
 		ArrayList<Point> adjacentLocations = getAdjacentFieldLocations(field);
+
+		// step the adjacent fields.
 		for (Point p : adjacentLocations) {
-			step(p.getX(), p.getY());
+			stepField(p);
 		}
 	}
 
+	/**
+	 * Finds the total number of mines around the <b>{@code field}</b>.
+	 * 
+	 * @param field that adjacent fields to it will be checked if they contains
+	 *              mine.
+	 * @return Total number of mines around the <b>{@code field}</b>.
+	 */
 	public int findMinesAround(Field field) {
-		int xPos = field.getLocation().getX();
-		int yPos = field.getLocation().getY();
+		if (field.isMine())
+			return -1;
+
+		Point p = field.getPoint();
 
 		int mines = 0;
 
-		if (xPos < row - 1) {
-			if (yPos < col - 1) {
-				if(getField(xPos + 1, yPos + 1).isMine())
+		int xPlus = p.getX() + 1;
+		int xMinus = p.getX() - 1;
+		int yPlus = p.getY() + 1;
+		int yMinus = p.getY() - 1;
+
+		// check down
+		if (p.getX() < row - 1) {
+			if (p.getY() < col - 1) {
+				if (getField(new Point(xPlus, yPlus)).isMine())
 					++mines;
 			}
-			if (yPos > 0) {
-				if(getField(xPos + 1, yPos - 1).isMine())
+			if (p.getY() > 0) {
+				if (getField(new Point(xPlus, yMinus)).isMine())
 					++mines;
 			}
-			if(getField(xPos + 1, yPos).isMine())
+			if (getField(new Point(xPlus, p.getY())).isMine())
 				++mines;
 		}
-		if (xPos > 0) {
-			if (yPos < col - 1) {
-				if(getField(xPos - 1, yPos + 1).isMine())
+		// check up
+		if (p.getX() > 0) {
+			if (p.getY() < col - 1) {
+				if (getField(new Point(xMinus, yPlus)).isMine())
 					++mines;
 			}
-			if (yPos > 0) {
-				if(getField(xPos - 1, yPos - 1).isMine())
+			if (p.getY() > 0) {
+				if (getField(new Point(xMinus, yMinus)).isMine())
 					++mines;
 			}
-			if(getField(xPos - 1, yPos).isMine())
+			if (getField(new Point(xMinus, p.getY())).isMine())
 				++mines;
 		}
-		if (yPos > 0) {
-			if(getField(xPos, yPos - 1).isMine())
+		// check left and right
+		if (p.getY() > 0) {
+			if (getField(new Point(p.getX(), yMinus)).isMine())
 				++mines;
 		}
-		if (yPos < col - 1) {
-			if(getField(xPos, yPos + 1).isMine())
+		if (p.getY() < col - 1) {
+			if (getField(new Point(p.getX(), yPlus)).isMine())
 				++mines;
 		}
 		return mines;
 	}
 
+	/**
+	 * Finds the locations of the fields that are adjacent to <b>{@code field}</b>.
+	 * 
+	 * @param field
+	 * @return The locations of the fields that are adjacent to
+	 *         <b>{@code field}</b>.
+	 */
 	private ArrayList<Point> getAdjacentFieldLocations(Field field) {
 		ArrayList<Point> adjacentLocations = new ArrayList<Point>();
 
-		int xPos = field.getLocation().getX();
-		int yPos = field.getLocation().getY();
+		Point p = field.getPoint();
 
-		if (xPos < row - 1) {
-			if (yPos < col - 1) {
-				adjacentLocations.add(new Point(xPos + 1, yPos + 1));
+		int xPlus = p.getX() + 1;
+		int xMinus = p.getX() - 1;
+		int yPlus = p.getY() + 1;
+		int yMinus = p.getY() - 1;
+
+		// check down
+		if (p.getX() < row - 1) {
+			if (p.getY() < col - 1) {
+				adjacentLocations.add(new Point(xPlus, yPlus));
 			}
-			if (yPos > 0) {
-				adjacentLocations.add(new Point(xPos + 1, yPos - 1));
+			if (p.getY() > 0) {
+				adjacentLocations.add(new Point(xPlus, yMinus));
 			}
-			adjacentLocations.add(new Point(xPos + 1, yPos));
+			adjacentLocations.add(new Point(xPlus, p.getY()));
 		}
-		if (xPos > 0) {
-			if (yPos < col - 1) {
-				adjacentLocations.add(new Point(xPos - 1, yPos + 1));
+		// check up
+		if (p.getX() > 0) {
+			if (p.getY() < col - 1) {
+				adjacentLocations.add(new Point(xMinus, yPlus));
 			}
-			if (yPos > 0) {
-				adjacentLocations.add(new Point(xPos - 1, yPos - 1));
+			if (p.getY() > 0) {
+				adjacentLocations.add(new Point(xMinus, yMinus));
 			}
-			adjacentLocations.add(new Point(xPos - 1, yPos));
+			adjacentLocations.add(new Point(xMinus, p.getY()));
 		}
-		if (yPos > 0) {
-			adjacentLocations.add(new Point(xPos, yPos - 1));
+		// check left and right
+		if (p.getY() > 0) {
+			adjacentLocations.add(new Point(p.getX(), yMinus));
 		}
-		if (yPos < col - 1) {
-			adjacentLocations.add(new Point(xPos, yPos + 1));
+		if (p.getY() < col - 1) {
+			adjacentLocations.add(new Point(p.getX(), yPlus));
 		}
 
 		return adjacentLocations;
 	}
 
-	private Field getField(int xPos, int yPos) {
-		return area[xPos][yPos];
+	public Field getField(Point p) {
+		return mineField[p.getX()][p.getY()];
 	}
 
 	/**
 	 * Creates the area matrix and fields.
 	 */
-	private void setArea() {
-		area = new Field[row][col];
+	private void initMineField() {
+		mineField = new Field[row][col];
 		for (int i = 0; i < row; ++i) {
 			for (int j = 0; j < col; ++j) {
-				area[i][j] = new Field(i, j, false);
+				mineField[i][j] = new Field(i, j, false);
 			}
 		}
 	}
@@ -164,79 +227,38 @@ public class MineSweeperGame {
 			do {
 				x = rndm.nextInt(row);
 				y = rndm.nextInt(col);
-			} while (area[x][y].isMine());
-			area[x][y].setMine(true);
+			} while (mineField[x][y].isMine());
+			System.out.println(x + " " + y);
+			mineField[x][y].setMine(true);
 			++placed;
 		}
 
 	}
 
-	/**
-	 * Checks if {@code row} is in valid range.
-	 * 
-	 * @param row value that is going to be checked.
-	 * @return {@code true} if {@code row} is in valid range, {@code false}
-	 *         otherwise.
-	 */
-	private boolean isValidRow(int row) {
-		if (row >= MIN_ROW && row <= MAX_ROW)
-			return false;
-		return true;
+	// getters and setters
+
+	public void setRow(int row) {
+		this.row = row;
 	}
 
-	/**
-	 * Checks if {@code col} is in valid range.
-	 * 
-	 * @param col value that is going to be checked.
-	 * @return {@code true} if {@code col} is in valid range, {@code false}
-	 *         otherwise.
-	 */
-	private boolean isValidCol(int col) {
-		if (col >= MIN_COL && col <= MAX_COL)
-			return false;
-		return true;
+	public void setCol(int col) {
+		this.col = col;
 	}
 
-	/**
-	 * Checks if {@code numOfMines} is in valid range.
-	 * 
-	 * @param numOfMines value that is going to be checked.
-	 * @return {@code true} if {@code numOfMines} is in valid range, {@code false}
-	 *         otherwise.
-	 */
-	private boolean isValidNumOfMines(int numOfMines) {
-		if (numOfMines <= (row * col) / 2 && numOfMines >= MIN_MINES)
-			return true;
-		return false;
+	public void setNumOfMines(int numOfMines) {
+		this.numOfMines = numOfMines;
 	}
 
-	public void setRow(int row) throws Exception {
-		if (isValidRow(row))
-			throw new Exception();
-		else
-			this.row = row;
-	}
-
-	public void setCol(int col) throws Exception {
-		if (isValidCol(col))
-			throw new Exception();
-		else
-			this.col = col;
-	}
-
-	public void setNumOfMines(int numOfMines) throws Exception {
-		if (isValidNumOfMines(numOfMines))
-			this.numOfMines = numOfMines;
-		else
-			throw new Exception();
-	}
-	
 	public int getRow() {
 		return row;
 	}
-	
+
 	public int getCol() {
 		return col;
+	}
+
+	public int getNumOfMines() {
+		return numOfMines;
 	}
 
 }

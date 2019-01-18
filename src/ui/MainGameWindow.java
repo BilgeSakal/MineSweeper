@@ -1,58 +1,78 @@
 package ui;
 
-import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.GridLayout;
 import java.awt.Toolkit;
 
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+
+import game.MineSweeperGame;
+import game.Point;
 
 public class MainGameWindow {
 
 	private static final int DEFAULT_WIDTH = 400;
 	private static final int DEFAULT_HEIGTH = 400;
 
-	private static final int SMALL = 10;
-	private static final int MEDIUM = 20;
-	private static final int LARGE = 30;
+	private static ButtonField[][] fields;
 
-	private static final int DEFAULT_ROW = MEDIUM;
-	private static final int DEFAULT_COL = MEDIUM;
-	
-	private static final int DEFAULT_MINES = DEFAULT_COL * DEFAULT_ROW / 4;
+	private static JFrame mainWindow;
 
-	private int prevRow = DEFAULT_ROW;
-	private int prevCol = DEFAULT_COL;
-	
-	
-	
-	private JButton[][] fields;
+	private static MineSweeperGame game;
 
 	public static void main(String[] args) {
+
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				
-				JFrame mainWindow = new JFrame();
-				
-				initFrame(mainWindow);
-				
+
+				mainWindow = new JFrame();
 				initMenuBar(mainWindow);
-				
+
+				game = new MineSweeperGame("Mine Sweeper", 10, 10, 10);
+				game.startGame();
+
+				initFrame(mainWindow, game);
+				initFields(game);
+				placeFields(mainWindow, game);
+
 			}
 		});
 	}
-	
-	public static void initFrame(JFrame frame) {
+
+	private static void initFields(MineSweeperGame game) {
+		fields = new ButtonField[game.getRow()][game.getCol()];
+		for (int i = 0; i < game.getRow(); ++i) {
+			for (int j = 0; j < game.getCol(); ++j) {
+				ButtonField newButton = new ButtonField(new Point(i, j));
+				game.getField(newButton.getPoint()).setObserver(newButton);
+				newButton.addActionListener(new FieldButtonAction(game, newButton));
+				fields[i][j] = newButton;
+			}
+		}
+	}
+
+	private static void placeFields(JFrame frame, MineSweeperGame game) {
+		for (int i = 0; i < game.getRow(); ++i) {
+			for (int j = 0; j < game.getCol(); ++j) {
+				frame.add(fields[i][j]);
+			}
+		}
+	}
+
+	private static void initFrame(JFrame frame, MineSweeperGame game) {
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
 		frame.setVisible(true);
+		frame.setTitle(game.getName());
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(DEFAULT_WIDTH, DEFAULT_HEIGTH);
 		frame.setLocation((int) (dim.width / 2 - frame.getSize().getWidth() / 2),
 				(int) (dim.height / 2 - frame.getSize().getHeight() / 2));
+		frame.setLayout(new GridLayout(game.getRow(), game.getCol()));
 	}
 
 	public static void initMenuBar(JFrame frame) {
@@ -60,19 +80,19 @@ public class MainGameWindow {
 
 		JMenu gameMenu = new JMenu("Game");
 		JMenuItem newGameMenuItem = new JMenuItem("New Game");
-		JMenuItem smallMenuItem = new JMenuItem("Small " + SMALL + "x" + SMALL);
-		JMenuItem mediumMenuItem = new JMenuItem("Medium " + MEDIUM + "x" + MEDIUM);
-		JMenuItem largeMenuItem = new JMenuItem("Large " + LARGE + "x" + LARGE);
-		JMenuItem customMenuItem = new JMenuItem("Custom Size");
 		gameMenu.add(newGameMenuItem);
-		gameMenu.add(smallMenuItem);
-		gameMenu.add(mediumMenuItem);
-		gameMenu.add(largeMenuItem);
-		gameMenu.add(customMenuItem);
-		
+
 		menuBar.add(gameMenu);
-		
+
 		frame.setJMenuBar(menuBar);
+	}
+
+	public static void disableButtons() {
+		for (int i = 0; i < fields.length; ++i) {
+			for (int j = 0; j < fields[i].length; ++j) {
+				fields[i][j].setEnabled(false);
+			}
+		}
 	}
 
 }
