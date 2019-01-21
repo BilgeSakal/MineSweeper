@@ -16,7 +16,6 @@ public class MineSweeperGame extends Game {
 	private boolean steppedMine;
 
 	private int totalSteppedFields;
-	private int minesLeft;
 
 	private Field[][] mineField;
 
@@ -24,7 +23,6 @@ public class MineSweeperGame extends Game {
 		super(name);
 		steppedMine = false;
 		totalSteppedFields = 0;
-		minesLeft = numOfMines;
 		setRow(row);
 		setCol(col);
 		setNumOfMines(numOfMines);
