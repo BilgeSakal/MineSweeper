@@ -4,8 +4,9 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
 
-import javax.swing.JButton;
+import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -36,22 +37,31 @@ public class MainGameWindow {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
-				MainGameWindow mgw = new MainGameWindow(20, 20, 50);
+				MainGameWindow mgw = new MainGameWindow();
 			}
 		});
 	}
 
-	public MainGameWindow(int row, int col, int numOfMines) {
-		game = new MineSweeperGame("Mine Sweeper", row, col, numOfMines);
+	public MainGameWindow() {
+		game = new MineSweeperGame("Mine Sweeper v1.0", 10, 10, 10);
 		game.startGame();
 		initFrame();
 		initPanel();
 		initMenuBar();
-		
 		initFields();
 		placeFields();
 	}
 
+	private void initGame(int row, int col, int numOfMines) {
+		game = new MineSweeperGame("Mine Sweeper v1.0", row, col, numOfMines);
+		game.startGame();
+		initFrame();
+		initPanel();
+		initMenuBar();
+		initFields();
+		placeFields();
+	}
+	
 	private void initPanel() {
 		gamePanel = new JPanel();
 		gamePanel.setLocation(0, 0);
@@ -105,7 +115,16 @@ public class MainGameWindow {
 	public void initMenuBar() {
 		menuBar = new JMenuBar();
 		JMenu gameMenu = new JMenu("Game");
-		JMenuItem newGameMenuItem = new JMenuItem("New Game");
+		JMenuItem newGameMenuItem = new JMenuItem(new AbstractAction("New Game") {
+			
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				mainWindow.dispose();
+				initGame(10, 10, 10);
+			}
+		});
 		gameMenu.add(newGameMenuItem);
 		menuBar.add(gameMenu);
 		mainWindow.setJMenuBar(menuBar);
