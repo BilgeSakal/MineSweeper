@@ -63,9 +63,10 @@ public class MainGameWindow {
 	}
 	
 	private void initPanel() {
+		int margin = 50;
 		gamePanel = new JPanel();
-		gamePanel.setLocation(0, 0);
-		gamePanel.setSize(mainWindow.getSize().width, mainWindow.getSize().height - 50);
+		gamePanel.setLocation(0, margin);
+		gamePanel.setSize(mainWindow.getSize().width, mainWindow.getSize().height - 50 - margin);
 		gamePanel.setLayout(new GridLayout(game.getRow(), game.getCol()));
 		mainWindow.add(gamePanel);
 	}
@@ -109,7 +110,7 @@ public class MainGameWindow {
 	}
 
 	public void calculateWindowHeight() {
-		windowHeigth = BUTTON_HEIGTH * game.getRow();
+		windowHeigth = BUTTON_HEIGTH * game.getRow() + 100;
 	}
 
 	public void initMenuBar() {
