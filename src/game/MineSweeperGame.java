@@ -7,6 +7,10 @@ public class MineSweeperGame extends Game {
 
 	public static final int GAME_LOSE = -1;
 	public static final int GAME_WIN = 1;
+	
+	public static final int SMALL = 10;
+	public static final int MEDIUM = 18;
+	public static final int LARGE = 25;
 
 	private int row;
 	private int col;
