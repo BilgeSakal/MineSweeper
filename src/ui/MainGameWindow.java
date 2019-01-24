@@ -38,18 +38,13 @@ public class MainGameWindow {
 			@Override
 			public void run() {
 				MainGameWindow mgw = new MainGameWindow();
+				mgw.initGame(10, 10, 10);
 			}
 		});
 	}
 
 	public MainGameWindow() {
-		game = new MineSweeperGame("Mine Sweeper v1.0", 10, 10, 10);
-		game.startGame();
-		initFrame();
-		initPanel();
-		initMenuBar();
-		initFields();
-		placeFields();
+		
 	}
 
 	private void initGame(int row, int col, int numOfMines) {
