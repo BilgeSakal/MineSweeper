@@ -1,3 +1,4 @@
+
 package game;
 
 import java.util.ArrayList;
@@ -7,18 +8,35 @@ public class MineSweeperGame extends Game {
 
 	public static final int GAME_LOSE = -1;
 	public static final int GAME_WIN = 1;
-	
+	public static final int GAME_NOT_FINISHED = -9;
+
 	public static final int SMALL = 10;
 	public static final int MEDIUM = 18;
 	public static final int LARGE = 25;
 
+	/**
+	 * Number of rows.
+	 */
 	private int row;
+
+	/**
+	 * Number of columns.
+	 */
 	private int col;
 
+	/**
+	 * Number of mines in the game.
+	 */
 	private int numOfMines;
 
+	/**
+	 * If <b>{@code true}</b>, the player stepped on a mine.
+	 */
 	private boolean steppedMine;
 
+	/**
+	 * Total number of fields that the player has stepped.
+	 */
 	private int totalSteppedFields;
 
 	private Field[][] mineField;
@@ -45,10 +63,31 @@ public class MineSweeperGame extends Game {
 		} else if (isWin()) {
 			return GAME_WIN;
 		} else {
-			return Game.NOT_FINISHED;
+			return GAME_NOT_FINISHED;
 		}
 	}
 
+	/**
+	 * Puts a flag on the field that on location <b>{@code p}</b>. If there is a
+	 * flag on the field already then removes the flag from the field.
+	 * 
+	 * @param p is the location of the field.
+	 */
+	public void putFlag(Point p) {
+		Field field = getField(p);
+		if (field.isFlag()) {
+			field.setFlag(false);
+		} else {
+			field.setFlag(true);
+		}
+	}
+
+	/**
+	 * Checks if the game is won.
+	 * 
+	 * @return <b>{@code true}</b> if the player revealed all the fields without
+	 *         stepping on a mine. <b>{@code false}</b> otherwise.
+	 */
 	public boolean isWin() {
 		int totalFields = row * col;
 		return totalFields - numOfMines == totalSteppedFields;
@@ -56,9 +95,10 @@ public class MineSweeperGame extends Game {
 
 	/**
 	 * Steps the field in the position <b>{@code p}</b>. If there is no mine around
-	 * the stepped field, the fields around the stepped field will be stepped.
+	 * the stepped field, the fields around the stepped field will be stepped as
+	 * well.
 	 * 
-	 * @param p indicates the location of the field.
+	 * @param p is the location of the field.
 	 */
 	public void stepField(Point p) {
 		Field steppedField = mineField[p.getX()][p.getY()];
@@ -98,11 +138,11 @@ public class MineSweeperGame extends Game {
 	/**
 	 * Finds the total number of mines around the <b>{@code field}</b>.
 	 * 
-	 * @param field that adjacent fields to it will be checked if they contains
-	 *              mine.
+	 * @param field that adjacent fields to it will be checked if there is mine on
+	 *              them.
 	 * @return Total number of mines around the <b>{@code field}</b>.
 	 */
-	public int findMinesAround(Field field) {
+	private int findMinesAround(Field field) {
 		if (field.isMine())
 			return -1;
 
@@ -201,6 +241,12 @@ public class MineSweeperGame extends Game {
 		return adjacentLocations;
 	}
 
+	/**
+	 * Returns the field on location <b>{@code p}</b>.
+	 * 
+	 * @param p is the location of the field.
+	 * @return The field on location <b>{@code p}</b>.
+	 */
 	public Field getField(Point p) {
 		return mineField[p.getX()][p.getY()];
 	}
@@ -212,13 +258,13 @@ public class MineSweeperGame extends Game {
 		mineField = new Field[row][col];
 		for (int i = 0; i < row; ++i) {
 			for (int j = 0; j < col; ++j) {
-				mineField[i][j] = new Field(i, j, false);
+				mineField[i][j] = new Field(new Point(i, j), false);
 			}
 		}
 	}
 
 	/**
-	 * Places the mines to the area.
+	 * Places the mines on the area.
 	 */
 	private void placeMines() {
 		Random rndm = new Random();

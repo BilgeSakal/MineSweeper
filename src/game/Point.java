@@ -10,9 +10,9 @@ public class Point {
 		this.y = y;
 	}
 	
-	public Point() {
-		this.x = 0;
-		this.y = 0;
+	@Override
+	public String toString() {
+		return "x: " + x + "\t" + "y: " + y; 
 	}
 	
 	//getters and setters
