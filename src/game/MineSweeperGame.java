@@ -14,6 +14,10 @@ public class MineSweeperGame extends Game {
 	public static final int MEDIUM = 18;
 	public static final int LARGE = 25;
 
+	private int prevRow;
+	private int prevCol;
+	private int prevMines;
+
 	/**
 	 * Number of rows.
 	 */
@@ -48,6 +52,9 @@ public class MineSweeperGame extends Game {
 		setRow(row);
 		setCol(col);
 		setNumOfMines(numOfMines);
+		this.prevRow = row;
+		this.prevCol = col;
+		this.prevMines = numOfMines;
 	}
 
 	@Override
@@ -307,6 +314,18 @@ public class MineSweeperGame extends Game {
 
 	public int getNumOfMines() {
 		return numOfMines;
+	}
+
+	public int getPrevRow() {
+		return prevRow;
+	}
+
+	public int getPrevCol() {
+		return prevCol;
+	}
+
+	public int getPrevMines() {
+		return prevMines;
 	}
 
 }

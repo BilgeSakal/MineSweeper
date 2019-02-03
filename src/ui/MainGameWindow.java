@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
 import game.MineSweeperGame;
@@ -62,7 +63,7 @@ public class MainGameWindow {
 	 * @param numOfMines is the number of mines in the game.
 	 */
 	private void initGame(int row, int col, int numOfMines) {
-		game = new MineSweeperGame("Mine Sweeper v1.1", row, col, numOfMines);
+		game = new MineSweeperGame("Mine Sweeper v1.2", row, col, numOfMines);
 		game.startGame();
 		initFrame();
 		initUpperPanel();
@@ -72,6 +73,10 @@ public class MainGameWindow {
 		mainWindow.pack();
 		setFrameLocation();
 		mainWindow.setVisible(true);
+	}
+
+	private void initGame() {
+		initGame(game.getPrevRow(), game.getPrevCol(), game.getPrevMines());
 	}
 
 	/**
@@ -94,7 +99,7 @@ public class MainGameWindow {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				mainWindow.dispose();
-				initGame(10, 10, 10);
+				initGame();
 			}
 		});
 		upperPanel.add(bida);
@@ -146,6 +151,13 @@ public class MainGameWindow {
 		JMenu gameMenu = new JMenu("Game");
 		menuBar.add(gameMenu);
 		mainWindow.setJMenuBar(menuBar);
+
+		// add small
+		gameMenu.add(getSmallMenuItem());
+		// add medium
+		gameMenu.add(getMediumMenuItem());
+		// add large
+		gameMenu.add(getLargeMenuItem());
 	}
 
 	/**
@@ -157,6 +169,55 @@ public class MainGameWindow {
 				game.getField(new Point(i, j)).setStepped(true);
 			}
 		}
+	}
+
+	private JMenuItem getSmallMenuItem() {
+		int smallRow = MineSweeperGame.SMALL;
+		int smallCol = MineSweeperGame.SMALL;
+		JMenuItem small = new JMenuItem("Small");
+		small.setToolTipText(smallRow + " x " + smallCol);
+		small.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				mainWindow.dispose();
+				initGame(smallRow, smallCol, defaultNumOfMines(smallRow, smallCol));
+			}
+		});
+		return small;
+	}
+
+	private JMenuItem getMediumMenuItem() {
+		int mediumRow = MineSweeperGame.MEDIUM;
+		int mediumCol = MineSweeperGame.MEDIUM;
+		JMenuItem medium = new JMenuItem("Medium");
+		medium.setToolTipText(mediumRow + " x " + mediumCol);
+		medium.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				mainWindow.dispose();
+				initGame(mediumRow, mediumCol, defaultNumOfMines(mediumRow, mediumCol));
+			}
+		});
+		return medium;
+	}
+
+	private JMenuItem getLargeMenuItem() {
+		int largeRow = MineSweeperGame.LARGE;
+		int largeCol = MineSweeperGame.LARGE;
+		JMenuItem large = new JMenuItem("Large");
+		large.setToolTipText(largeRow + " x " + largeCol);
+		large.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				mainWindow.dispose();
+				initGame(largeRow, largeCol, defaultNumOfMines(largeRow, largeCol));
+			}
+		});
+		return large;
+	}
+
+	private int defaultNumOfMines(int row, int col) {
+		return row * col / 10;
 	}
 
 	// getters and setters
