@@ -12,5 +12,6 @@ public enum ButtonIcon {
 	EIGHT,
 	DEFAULT,
 	FLAG,
-	MINE
+	MINE,
+	STEP_MINE
 }

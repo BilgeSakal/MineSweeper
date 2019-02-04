@@ -15,8 +15,8 @@ public class ButtonField extends JButton {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final int BUTTON_WIDTH = 20;
-	private static final int BUTTON_HEIGTH = 20;
+	private static final int BUTTON_WIDTH = 23;
+	private static final int BUTTON_HEIGTH = 23;
 
 	/**
 	 * Button images.
@@ -62,16 +62,20 @@ public class ButtonField extends JButton {
 	 * @return the image-array.
 	 */
 	public static BufferedImage[] getIcons() {
-		BufferedImage[] icons = new BufferedImage[12];
+		BufferedImage[] icons = new BufferedImage[13];
 		BufferedImage img = new BufferedImage(BUTTON_WIDTH, BUTTON_HEIGTH, BufferedImage.TYPE_INT_RGB);
 		try {
 			img = ImageIO.read(ButtonField.class.getResource("/flag.png"));
 			img = ImageManipulation.resize(img, BUTTON_WIDTH, BUTTON_HEIGTH);
 			icons[ButtonIcon.FLAG.ordinal()] = img;
 
-			img = ImageIO.read(ButtonField.class.getResource("/mine.png"));
+			img = ImageIO.read(ButtonField.class.getResource("/mine.jpg"));
 			img = ImageManipulation.resize(img, BUTTON_WIDTH, BUTTON_HEIGTH);
 			icons[ButtonIcon.MINE.ordinal()] = img;
+
+			img = ImageIO.read(ButtonField.class.getResource("/stepMine.jpg"));
+			img = ImageManipulation.resize(img, BUTTON_WIDTH, BUTTON_HEIGTH);
+			icons[ButtonIcon.STEP_MINE.ordinal()] = img;
 
 			img = ImageIO.read(ButtonField.class.getResource("/default.png"));
 			img = ImageManipulation.resize(img, BUTTON_WIDTH, BUTTON_HEIGTH);

@@ -6,14 +6,17 @@ import java.awt.GridLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.SwingConstants;
 
 import game.MineSweeperGame;
 import game.Point;
@@ -41,12 +44,16 @@ public class MainGameWindow {
 
 	private MineSweeperGame game;
 
+	private JLabel minesLeft;
+
+	private TimeLabel timeLabel;
+
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				MainGameWindow mgw = new MainGameWindow();
-				mgw.initGame(10, 10, 10);
+				mgw.smallClicked();
 			}
 		});
 	}
@@ -63,7 +70,7 @@ public class MainGameWindow {
 	 * @param numOfMines is the number of mines in the game.
 	 */
 	private void initGame(int row, int col, int numOfMines) {
-		game = new MineSweeperGame("Mine Sweeper v1.2", row, col, numOfMines);
+		game = new MineSweeperGame("Mine Sweeper v1.3", row, col, numOfMines);
 		game.startGame();
 		initFrame();
 		initUpperPanel();
@@ -93,7 +100,7 @@ public class MainGameWindow {
 	 */
 	private void initUpperPanel() {
 		upperPanel = new JPanel();
-		upperPanel.setLayout(new BoxLayout(upperPanel, BoxLayout.LINE_AXIS));
+		upperPanel.setLayout(new GridLayout(1, 3));
 		JButton bida = new JButton("Bida");
 		bida.addActionListener(new ActionListener() {
 			@Override
@@ -102,8 +109,19 @@ public class MainGameWindow {
 				initGame();
 			}
 		});
+		initMineLabel();
+		initTimeLabel();
+
+		minesLeft.setHorizontalAlignment(SwingConstants.CENTER);
+		bida.setHorizontalAlignment(SwingConstants.CENTER);
+		timeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+		upperPanel.add(minesLeft);
 		upperPanel.add(bida);
+		upperPanel.add(timeLabel);
+
 		mainWindow.add(upperPanel);
+
 	}
 
 	/**
@@ -180,10 +198,16 @@ public class MainGameWindow {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				mainWindow.dispose();
-				initGame(smallRow, smallCol, defaultNumOfMines(smallRow, smallCol));
+				smallClicked();
 			}
 		});
 		return small;
+	}
+
+	private void smallClicked() {
+		int smallRow = MineSweeperGame.SMALL;
+		int smallCol = MineSweeperGame.SMALL;
+		initGame(smallRow, smallCol, MineSweeperGame.defaultNumOfMines(smallRow, smallCol));
 	}
 
 	private JMenuItem getMediumMenuItem() {
@@ -195,7 +219,7 @@ public class MainGameWindow {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				mainWindow.dispose();
-				initGame(mediumRow, mediumCol, defaultNumOfMines(mediumRow, mediumCol));
+				initGame(mediumRow, mediumCol, MineSweeperGame.defaultNumOfMines(mediumRow, mediumCol));
 			}
 		});
 		return medium;
@@ -210,14 +234,31 @@ public class MainGameWindow {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				mainWindow.dispose();
-				initGame(largeRow, largeCol, defaultNumOfMines(largeRow, largeCol));
+				initGame(largeRow, largeCol, MineSweeperGame.defaultNumOfMines(largeRow, largeCol));
 			}
 		});
 		return large;
 	}
 
-	private int defaultNumOfMines(int row, int col) {
-		return row * col / 10;
+	private void initMineLabel() {
+		minesLeft = new JLabel("mines: " + game.getPlacedFlags() + "/" + game.getNumOfMines());
+	}
+
+	private void initTimeLabel() {
+		timeLabel = new TimeLabel();
+		timeLabel.setText("time: 0");
+		game.getTimer().setLabelObserver(timeLabel);
+	}
+
+	public void updateMineLabel() {
+		minesLeft.setText("mines: " + game.getPlacedFlags() + "/" + game.getNumOfMines());
+	}
+
+	public void revealMines() {
+		ArrayList<Point> mineLocations = game.getMineLocations();
+		for (int i = 0; i < mineLocations.size(); ++i) {
+			game.stepField(mineLocations.get(i));
+		}
 	}
 
 	// getters and setters
@@ -228,6 +269,10 @@ public class MainGameWindow {
 
 	public JFrame getMainWindow() {
 		return mainWindow;
+	}
+
+	public JLabel getMineLabel() {
+		return minesLeft;
 	}
 
 }

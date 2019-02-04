@@ -43,18 +43,28 @@ public class MineSweeperGame extends Game {
 	 */
 	private int totalSteppedFields;
 
+	private int placedFlags;
+
 	private Field[][] mineField;
+
+	private Timer timer;
+
+	private ArrayList<Point> mineLocations;
 
 	public MineSweeperGame(String name, int row, int col, int numOfMines) {
 		super(name);
 		steppedMine = false;
+		mineLocations = new ArrayList<Point>(numOfMines);
 		totalSteppedFields = 0;
+		placedFlags = 0;
 		setRow(row);
 		setCol(col);
 		setNumOfMines(numOfMines);
 		this.prevRow = row;
 		this.prevCol = col;
 		this.prevMines = numOfMines;
+		this.timer = new Timer();
+		timer.start();
 	}
 
 	@Override
@@ -84,8 +94,12 @@ public class MineSweeperGame extends Game {
 		Field field = getField(p);
 		if (field.isFlag()) {
 			field.setFlag(false);
+			--placedFlags;
 		} else {
-			field.setFlag(true);
+			if (placedFlags < numOfMines) {
+				field.setFlag(true);
+				++placedFlags;
+			}
 		}
 	}
 
@@ -285,9 +299,14 @@ public class MineSweeperGame extends Game {
 			} while (mineField[x][y].isMine());
 			System.out.println(x + " " + y);
 			mineField[x][y].setMine(true);
+			mineLocations.add(new Point(x, y));
 			++placed;
 		}
 
+	}
+
+	public static int defaultNumOfMines(int row, int col) {
+		return row * col / 8;
 	}
 
 	// getters and setters
@@ -326,6 +345,18 @@ public class MineSweeperGame extends Game {
 
 	public int getPrevMines() {
 		return prevMines;
+	}
+
+	public int getPlacedFlags() {
+		return placedFlags;
+	}
+
+	public Timer getTimer() {
+		return timer;
+	}
+
+	public ArrayList<Point> getMineLocations() {
+		return mineLocations;
 	}
 
 }
