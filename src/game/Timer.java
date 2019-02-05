@@ -22,7 +22,8 @@ public class Timer extends Thread {
 		while (running) {
 			try {
 				Thread.sleep(1000);
-				incTime();
+				if (running)
+					incTime();
 			} catch (InterruptedException e) {
 				running = false;
 				e.printStackTrace();
